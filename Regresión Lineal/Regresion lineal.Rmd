@@ -1,0 +1,278 @@
+---
+title: "Laboratorio 1 - Econometría en R - Rodolfo Zea"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Cargamos el archivo "Admission_Predict_Ver1.1.csv" que se utiliza como fuente de datos para el presente laboratorio.
+
+```{r}
+dataset <- read.csv("Admission_Predict_Ver1.1.csv")
+```
+
+1. Realice un análisis estadístico sobre todas las variables del dataset, recuerde que pude usar la función summary()
+
+Variable Serial No.:
+```{r}
+summary(dataset$Serial.No.)
+```
+
+Variable GRE.Score:
+```{r}
+summary(dataset$GRE.Score)
+```
+
+Variable TOEFL.Score:
+```{r}
+summary(dataset$TOEFL.Score)
+```
+
+Variable University.Rating:
+```{r}
+summary(dataset$University.Rating)
+```
+
+Variable SOP:
+```{r}
+summary(dataset$SOP)
+```
+
+Variable LOR:
+```{r}
+summary(dataset$LOR)
+```
+
+Variable CGPA:
+```{r}
+summary(dataset$CGPA)
+```
+
+Variable Research:
+```{r}
+summary(dataset$Research)
+```
+
+Variable Chance.Of.Admit:
+```{r}
+summary(dataset$Chance.of.Admit)
+```
+
+2. Realice  una  gráfica  de  histograma  o  densidad  para  cada  una  de  las  variable  numéricas: GRE.Score, TOEFEL.Score, CGPA y Chance of Admit
+
+Variable GRE.Score
+```{r}
+dataset %>%
+  ggplot(aes(x=GRE.Score, y=..density..)) +
+  geom_density(fill="red", lwd=1) +
+  theme_classic() +
+  xlim(0,340)
+```
+
+
+Variable TOEFL.Score
+```{r}
+dataset %>%
+  ggplot(aes(x=TOEFL.Score, y=..density..)) +
+  geom_density(fill="violet", lwd=1) +
+  theme_classic() +
+  xlim(0,120)
+```
+
+
+Variable CGPA
+```{r}
+dataset %>%
+  ggplot(aes(x=CGPA, y=..density..)) +
+  geom_density(fill="blue", lwd=1) +
+  theme_classic() +
+  xlim(6.800,9.920)
+```
+
+
+Variable Chance.of.Admit
+```{r}
+dataset %>%
+  ggplot(aes(x=Chance.of.Admit, y=..density..)) +
+  geom_density(fill="skyBlue", lwd=1) +
+  theme_classic() +
+  xlim(0,1)
+```
+
+3. Realice una gráfica de correlación entre las variables del inciso 2.
+
+```{r}
+datasetInteres <- select(dataset, GRE.Score, TOEFL.Score, CGPA, Chance.of.Admit)
+correlacion <- cor(datasetInteres)
+corrplot(correlacion, method="number")
+```
+
+4. Realice comentarios sobre el análisis estadístico de las variables numéricas
+
+Como es posible observar, todas las variables numéricas tienen alto grado de correlación positiva, esto quiere decir que, por cada par de variables seleccionadas, al momento que una de ellas cambie su valor, la otra también cambiará en la misma dirección que lo hizo la primera. Para el caso de las variables numéricas seleccionadas, casi todas cambian en una medida muy similar a la variable en comparación, esto puesto que el coeficiente de correlación es muy cercano a uno.
+
+Si comparamos las variables independiantes (GRE.Score, TOEFL.Score y CGPA) contra la variable dependiente Chance.Of.Admit, podemos decir que:
+
+GRE.Score tiene una correlación de 0.81 con Chance.Of.Admit. Esto quiere decir que un cambio en 1 en GRE.Score representaria un cambio de 0.81 en Chance.Of.Admit.
+
+TOEFL.Score tiene una correlación de 0.79 con Chance.Of.Admit. Esto quiere decir que un cambio en 1 en TOEFL.Score representa un cambio de 0.79 en Chance.Of.Admit.
+
+CGPA tiene una correlación de 0.88 con Chance.Of.Admit. Esto quiere decir que un cambio en1 en CGPA representa un cambio de 0.88 en Chance.Of.Admit.
+
+5. Realice un scatter plot de todas las variables numéricas contra la variable Chance of Admit
+
+Variable GRE.Score:
+```{r}
+ggplot(dataset, aes(x=GRE.Score, y=Chance.of.Admit)) +
+    geom_point(shape=1)
+```
+
+Variable TOEFL.Score:
+```{r}
+ggplot(dataset, aes(x=TOEFL.Score, y=Chance.of.Admit)) +
+    geom_point(shape=1)
+```
+
+Variable CGPA:
+```{r}
+ggplot(dataset, aes(x=CGPA, y=Chance.of.Admit)) +
+    geom_point(shape=1)
+```
+
+
+6. Realice un modelo de regresión lineal simple con cada variable numéreica como X y la variable Chance of Admit como Y
+
+Variable GRE.Score:
+```{r}
+modeloGREScore<-lm(data = dataset,
+                    formula = Chance.of.Admit ~ GRE.Score)
+
+modeloGREScore
+```
+
+
+Variable TOEFL.Score:
+```{r}
+modeloTOEFLScore<-lm(data = dataset,
+                    formula = Chance.of.Admit ~ TOEFL.Score)
+
+modeloTOEFLScore
+```
+
+Variable CGPA:
+```{r}
+modeloCGPA<-lm(data = dataset,
+                    formula = Chance.of.Admit ~ CGPA)
+
+modeloCGPA
+```
+
+7. Realice una gráfica de cada modelo de regresión lineal en su scatter plot correspondiente.
+
+Variable GRE.Score:
+```{r}
+ggplot(dataset, aes(x=GRE.Score, y=Chance.of.Admit)) +
+    geom_point(shape=1) + 
+    stat_smooth(method = "lm", col="red")
+```
+
+Variable TOEFL.Score:
+```{r}
+ggplot(dataset, aes(x=TOEFL.Score, y=Chance.of.Admit)) +
+    geom_point(shape=1) +
+    stat_smooth(method = "lm", col="violet")
+```
+
+Variable CGPA:
+```{r}
+ggplot(dataset, aes(x=CGPA, y=Chance.of.Admit)) +
+    geom_point(shape=1) +
+    stat_smooth(method = "lm", col="blue")
+```
+
+8. Realice un análisis sobre los resultados de cada modelo y diga cual de éstos considera que es mejor y por qué.
+
+Variable GRE.Score:
+```{r}
+summary(modeloGREScore)
+```
+Análisis de los residuos:
+
+Los residuos indican la diferencia entre el valor observado y el valor que el modelo predice. En este caso, es posible observar que los residuos se encuentran en un rango entre -0.33784 y 0.18568 que son bastante pequeños en proporción a los valores de las mediciones. La mediana de los residuos es 0.00417, podemos ver que existe cierto sesgo a la izquierda.
+
+Análisis de los coeficientes:
+Podemos ver que tanto para el intercepto, como para el aproximado para el coeficiente para GRE.Score, el error estándar es bastante pequeño en comparación al valor de su estimado (valor esperado). Vemos que el valor de t es bastante grande y alejado de 0 y que el  valor de Pr(>t), que es la probabilidad de observar un valor igual o mayor a t, es pequeñisimo. 
+
+El error estándar de los residuos es bastante bajo (0.08278), por lo que podemos decir que el modelo de regresión lineal encaja bastante bien con los datos.
+
+Analizando el coeficiente de determinación podemos ver que tiene un valor de 0.6567 que nos indica que la linea de regresión del modelo no se ajusta tan bien, como se esperaría, a los datos observados. Esto considerando que el valor mínimo es 0 y el valor máximo 1. Es importante recalcar que un valor de 1 no indica que sea el mejor modelo, puesto que estaría ajustado de más.
+
+Podemos apreciar que el estadístico de F es bastante mayor a uno y por consiguiente podemos decir que sí hay una relación entre la variable GRE.Score y Chance.of.Admit.
+
+
+
+Variable TOEFL.Score:
+```{r}
+summary(modeloTOEFLScore)
+```
+Análisis de los residuos:
+
+Los residuos indican la diferencia entre el valor observado y el valor que el modelo predice. En este caso, es posible observar que los residuos se encuentran en un rango entre -0.31337 y 0.20725 que son bastante pequeños en proporción a los valores de las mediciones. La mediana de los residuos es 0.01310, bastante cerca del centro del rango.
+
+Análisis de los coeficientes:
+Podemos ver que tanto para el intercepto, como para el aproximado para el coeficiente para GRE.Score, el error estándar es bastante pequeño en comparación al valor de su estimado (valor esperado). Vemos que el valor de t es bastante grande y alejado de 0 y que el  valor de Pr(>t), que es la probabilidad de observar un valor igual o mayor a t, es pequeñisimo. 
+
+El error estándar de los residuos es bastante bajo (0.08621), por lo que podemos decir que el modelo de regresión lineal encaja bastante bien con los datos.
+
+Analizando el coeficiente de determinación podemos ver que tiene un valor de 0.6276 que nos indica que la linea de regresión del modelo no se ajusta tan bien, como se esperaría, a los datos observados. Esto considerando que el valor mínimo es 0 y el valor máximo 1. Es importante recalcar que un valor de 1 no indica que sea el mejor modelo, puesto que estaría ajustado de más.
+
+Podemos apreciar que el estadístico de F es bastante mayor a uno y por consiguiente podemos decir que sí hay una relación entre la variable GRE.Score y Chance.of.Admit.
+
+
+Variable CGPA:
+```{r}
+summary(modeloCGPA)
+```
+
+Análisis de los residuos:
+
+Los residuos indican la diferencia entre el valor observado y el valor que el modelo predice. En este caso, es posible observar que los residuos se encuentran en un rango entre -0.276592 y 0.176961 que son bastante pequeños en proporción a los valores de las mediciones. La mediana de los residuos es 0.006619, bastante cerca del centro del rango.
+
+Análisis de los coeficientes:
+Podemos ver que tanto para el intercepto, como para el aproximado para el coeficiente para GRE.Score, el error estándar es bastante pequeño en comparación al valor de su estimado (valor esperado). Vemos que el valor de t es bastante grande y alejado de 0 y que el  valor de Pr(>t), que es la probabilidad de observar un valor igual o mayor a t, es pequeñisimo. 
+
+El error estándar de los residuos es bastante bajo (0.06647), por lo que podemos decir que el modelo de regresión lineal encaja bastante bien con los datos.
+
+Analizando el coeficiente de determinación podemos ver que tiene un valor de 0.7787 que nos indica que la linea de regresión del modelo se ajusta bastante bien a los datos observados. Esto considerando que el valor mínimo es 0 y el valor máximo 1. Es importante recalcar que un valor de 1 no indica que sea el mejor modelo, puesto que estaría ajustado de más.
+
+Podemos apreciar que el estadístico de F es bastante mayor a uno y por consiguiente podemos decir que sí hay una relación entre la variable GRE.Score y Chance.of.Admit.
+
+CONCLUSIÓN:
+
+Podemos concluir que el modelo que mejor se apega es el obtenido a partir de la variable independiente CGPA, esto debido a que el coeficiente de determinación es el más alto (no estando demasiado cerca de 1, sino a un valor bastante razonable), el error estandar residual es el menor de los tres modelos y el estadístico de F es bastante alto.
+
+
+
+
+
+
+
+
+
+

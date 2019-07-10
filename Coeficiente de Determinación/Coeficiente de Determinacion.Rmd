@@ -1,0 +1,72 @@
+---
+title: "Cálculo de parámetros de regresión y valor de R2 (coeficiente de determinación)"
+output:
+  html_document:
+    df_print: paged
+---
+
+En el presente documento mostramos un ejemplo de una función que calcula los parámetros de regresión (Betas) de un modelo de regresión lineal en los parámetros. Adicionalmente, como parte de la función, se calcula el valor del coeficiente de determinación R2.
+
+Los parámetros de la función son los siguientes:
+
+df: Data frame que contiene los valores de Y y X. La primer columna corresponde a los valores de Y y el resto de columna a los distintos valores de Xn.
+
+La fórmula que se utiliza para el cálculo de los parámetros de regresión (B) es la siguiente:
+B = (X'X)^-1 (X'Y)
+
+```{r}
+library(dplyr)
+
+regresion_lineal <- function(df) {
+  # Obtenemos la Y que es la primer columna del data frame df
+  Y <- as.matrix(df[1])
+  
+  # Obtenemos X que es el resto de columnas del data frame df
+  # Se agrega una primer columna con valores de 1 
+  numcol <- ncol(df)
+  xcols <- df %>% select(2:numcol)
+  X <- as.matrix(cbind(1,xcols))
+  
+  # Se calcula la transpuesta X' de X
+  XT <- t(X)
+  
+  # Se calculan las B con la función B = (X'X)^-1 (X'Y)
+  B <- solve(XT %*% X) %*% (XT %*% Y)
+  
+  # Calculamos el valor de R2
+  yhat <- X %*% B
+  
+  # Calculamos la media "u" para y
+  yu <- mean(Y)
+  
+  # Calculamos el valor de R2
+  R2 <- (sum((yhat - yu)^2))/(sum((Y - yu)^2))
+  
+  # Imprimimos los valores de Beta
+  cat("Betas: ", B, "\n")
+  
+  # Imprimimos el valor de R2
+  cat("R2: ", R2)
+  
+  #retornamos el valor de las Betas y de R2
+  return (B)
+}
+```
+
+Una vez definida la fórmula, procedemos a un sencillo ejemplo para mostrar su funcionamiento.
+
+```{r}
+# Creamos variables de prueba para y
+y <- c(5000,6000,7000, 8040)
+
+# creamos valores de prueba para x1, x2 y x3
+x1 <- c(21, 23, 26, 55)
+x2 <- c(24, 24, 25, 60)
+x3 <- c(20, 25, 25, 80)
+
+# Creamos el data frame a enviar como parámetro a la función regresion_lineal
+df <- data.frame(y, x1, x2, x3)
+
+# Ejecutamos la función
+betas <- regresion_lineal(df)
+```
