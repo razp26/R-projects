@@ -31,29 +31,30 @@ forward_stepwise_selection <- function(dataset, yname) {
       
       # Evaluamos el modelo a partir de la formula
       fit <- lm(formula=formula_x, data=dataset)
-      test_perd <- predict(fit, dataset)
+      #test_perd <- predict(fit, dataset)
       
       # Calculamos el error cuadrado
-      se <- sum((test_perd - dataset[[yname]])^2)
+      #se <- sum((test_perd - dataset[[yname]])^2)
+      se <- summary(fit)$r.squared
       
       # Agregamos el error cuadrado del modelo a nuestra lista de errores cuadrados
       lista_se_iteracion <- c(lista_se_iteracion, se)
       
     }
     
-    indice_error_minimo_iteracion <- which.min(lista_se_iteracion)
-    features_seleccionadas <- c(features_seleccionadas, features_disponibles[indice_error_minimo_iteracion])
-    features_disponibles <- setdiff(features_disponibles, features_disponibles[indice_error_minimo_iteracion])
-    lista_se_global <- c(lista_se_global, lista_se_iteracion[indice_error_minimo_iteracion])
+    indice_r2_maximo_iteracion <- which.max(lista_se_iteracion)
+    features_seleccionadas <- c(features_seleccionadas, features_disponibles[indice_r2_maximo_iteracion])
+    features_disponibles <- setdiff(features_disponibles, features_disponibles[indice_r2_maximo_iteracion])
+    lista_se_global <- c(lista_se_global, lista_se_iteracion[indice_r2_maximo_iteracion])
     
     print('Features: ')
     print(features_seleccionadas)
-    print('Error minimo: ')
-    print(lista_se_iteracion[indice_error_minimo_iteracion])
+    print('R2: ')
+    print(lista_se_iteracion[indice_r2_maximo_iteracion])
   }
   
-  indice_error_minimo_global <- which.min(lista_se_global)
-  return (features_seleccionadas[1:indice_error_minimo_global])
+  indice_r2_maximo_global <- which.max(lista_se_global)
+  return (features_seleccionadas[1:indice_r2_maximo_global])
   
 }
 
@@ -76,19 +77,20 @@ backward_stepwise_selection <- function(dataset, yname) {
   
   # Evaluamos el modelo a partir de la formula
   fit <- lm(formula=formula_x, data=dataset)
-  test_perd <- predict(fit, dataset)
+  #test_perd <- predict(fit, dataset)
   
   # Calculamos el error cuadrado
-  se <- sum((test_perd - dataset[[yname]])^2)
+  #se <- sum((test_perd - dataset[[yname]])^2)
+  se <- summary(fit)$r.squared
   
-  # Agregamos el modelo que incluye todas las features así como su error
+  # Agregamos el modelo que incluye todas las features así como su R2
   lista_se_global <- c(lista_se_global, se)
   modelos[[length(lista_se_global)]] <- features_seleccionadas
   n_features_seleccionadas = length(features_seleccionadas)
   
   print('Features: ')
   print(features_seleccionadas)
-  print('Error minimo: ')
+  print('R2 maximo: ')
   print(se)
   
   # Creamos un ciclo a partir del cual vamos eliminando un feature a la vez del modelo
@@ -106,30 +108,31 @@ backward_stepwise_selection <- function(dataset, yname) {
       
       # Evaluamos el modelo a partir de la formula
       fit <- lm(formula=formula_x, data=dataset)
-      test_perd <- predict(fit, dataset)
+      #test_perd <- predict(fit, dataset)
       
       # Calculamos el error cuadrado
-      se <- sum((test_perd - dataset[[yname]])^2)
+      #se <- sum((test_perd - dataset[[yname]])^2)
+      se <- summary(fit)$r.squared
       
       # Agregamos el error cuadrado del modelo a nuestra lista de errores cuadrados
       lista_se_iteracion <- c(lista_se_iteracion, se)
     }
     
-    indice_error_minimo_iteracion <- which.min(lista_se_iteracion)
-    features_seleccionadas <- setdiff(features_seleccionadas, features_seleccionadas[indice_error_minimo_iteracion])
-    lista_se_global <- c(lista_se_global, lista_se_iteracion[indice_error_minimo_iteracion])
+    indice_r2_maximo_iteracion <- which.max(lista_se_iteracion)
+    features_seleccionadas <- setdiff(features_seleccionadas, features_seleccionadas[indice_r2_maximo_iteracion])
+    lista_se_global <- c(lista_se_global, lista_se_iteracion[indice_r2_maximo_iteracion])
     modelos[[length(lista_se_global)]] <- features_seleccionadas
     n_features_seleccionadas = length(features_seleccionadas)
     
     print('Features: ')
     print(features_seleccionadas)
-    print('Error minimo: ')
-    print(lista_se_iteracion[indice_error_minimo_iteracion])
+    print('R2 maximo: ')
+    print(lista_se_iteracion[indice_r2_maximo_iteracion])
     
   }
   
-  indice_error_minimo_global <- which.min(lista_se_global)
-  return(modelos[[indice_error_minimo_global]])
+  indice_r2_maximo_global <- which.max(lista_se_global)
+  return(modelos[[indice_r2_maximo_global]])
   
 }
 
